@@ -1,5 +1,6 @@
 package com.chasonchoate.jsonapi.common
 
+import javax.servlet.http.HttpServletRequest
 import kotlin.reflect.KProperty
 import kotlin.reflect.KProperty0
 
@@ -9,7 +10,7 @@ abstract class Resource(var id: String, var type: String) {
      */
     abstract fun attributes(): List<KProperty<*>>
 
-    fun toResource(): JSONAPIResource {
+    fun toResource(req: HttpServletRequest? = null): JSONAPIResource {
         val res = JSONAPIResource(id, type)
         val attributes = mutableMapOf<String, Any>()
         attributes().forEach { prop ->
@@ -19,6 +20,9 @@ abstract class Resource(var id: String, var type: String) {
         }
         if (attributes.isNotEmpty()) {
             res.attributes = attributes
+        }
+        req?.let {
+            res.links = mapOf("self" to req.requestURL.toString() + '/' + id)
         }
         return res
     }

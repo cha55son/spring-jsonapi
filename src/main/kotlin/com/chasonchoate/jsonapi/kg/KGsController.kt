@@ -1,9 +1,11 @@
 package com.chasonchoate.jsonapi.kg
 
+import com.chasonchoate.jsonapi.common.JSONAPIController
 import com.chasonchoate.jsonapi.common.ResourceController
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.RequestMapping
 
-@RestController // TODO: Get rid of this
+@JSONAPIController
+@RequestMapping("/kgs")
 class KGsController : ResourceController<KG>() {
     // GET /kgs
     override fun index(): List<KG> {
@@ -11,6 +13,10 @@ class KGsController : ResourceController<KG>() {
         kg1.active = false
         return listOf(kg1, KG("2"))
     }
-    // fun show() { ... }                   // GET /kgs/:id
+    override fun show(id: String): KG {
+        val kg1 = KG("1")
+        kg1.active = false
+        return kg1
+    }
     // fun showRelationship() { ... }       // GET /kgs/:id/relationships/comms
 }

@@ -23,9 +23,7 @@ class JSONAPIResourceHasManyRelationship(var data: List<JSONAPIResourceID>?) : J
 /**
  * TODO: Somehow allow strings here too
  */
-class JSONAPILink(var href: String) {
-    var meta: Map<String, Any>? = null
-}
+typealias JSONAPILink = String
 
 class JSONAPIResourceID(var id: String, var type: String)
 
