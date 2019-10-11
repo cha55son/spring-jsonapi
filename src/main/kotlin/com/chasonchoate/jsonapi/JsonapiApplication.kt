@@ -9,3 +9,10 @@ class JsonapiApplication
 fun main(args: Array<String>) {
 	runApplication<JsonapiApplication>(*args)
 }
+
+/**
+ * jsonapi
+ * 	.root { doc ->
+ * 		doc.links.put("custom", "some path")
+ * 	}
+ */

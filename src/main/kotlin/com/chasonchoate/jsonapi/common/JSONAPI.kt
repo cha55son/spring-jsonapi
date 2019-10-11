@@ -13,11 +13,15 @@ class JSONAPIResourcesDocument(var data: List<JSONAPIResource>) : JSONAPIDocumen
 class JSONAPIResourceIDDocument(var data: JSONAPIResourceID) : JSONAPIDocumentBase()
 class JSONAPIResourceIDsDocument(var data: List<JSONAPIResourceID>) : JSONAPIDocumentBase()
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 open class JSONAPIResourceRelationshipBase {
     var meta: Map<String, Any>? = null
     var links: Map<String, JSONAPILink>? = null
 }
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 class JSONAPIResourceHasOneRelationship(var data: JSONAPIResourceID?) : JSONAPIResourceRelationshipBase()
+@JsonInclude(JsonInclude.Include.NON_NULL)
 class JSONAPIResourceHasManyRelationship(var data: List<JSONAPIResourceID>?) : JSONAPIResourceRelationshipBase()
 
 /**

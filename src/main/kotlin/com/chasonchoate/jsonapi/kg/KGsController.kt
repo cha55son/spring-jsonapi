@@ -5,9 +5,8 @@ import com.chasonchoate.jsonapi.common.ResourceController
 import org.springframework.web.bind.annotation.RequestMapping
 
 @JSONAPIController
-@RequestMapping("/kgs")
+@RequestMapping(KGS_PATH)
 class KGsController : ResourceController<KG>() {
-    // GET /kgs
     override fun index(): List<KG> {
         val kg1 = KG("1")
         kg1.active = false

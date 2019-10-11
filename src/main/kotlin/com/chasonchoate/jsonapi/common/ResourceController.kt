@@ -9,9 +9,11 @@ open class ResourceController<T : Resource> {
     open fun index(): List<T> = throw NotImplementedError()
     // GET /foos/:id
     open fun show(id: String): T = throw NotImplementedError()
+    // GET /foos/:id/relationships/bars
+    open fun showRelationship(id: String, relationship: String): List<JSONAPIResourceID> = throw NotImplementedError()
 
 
-    @GetMapping("/")
+    @GetMapping
     fun indexInternal(req: HttpServletRequest): JSONAPIResourcesDocument {
         val resources = index().map { it.toResource(req) }
         val doc = JSONAPIResourcesDocument(resources)
@@ -20,14 +22,34 @@ open class ResourceController<T : Resource> {
     }
     @GetMapping("/{id}")
     fun showInternal(@PathVariable("id") id: String, req: HttpServletRequest): JSONAPIResourceDocument {
-        val resource = show(id).toResource()
+        val resource = show(id).toResource(req)
         val doc = JSONAPIResourceDocument(resource)
-        doc.links = mapOf("self" to req.requestURL.toString())
+        doc.links = resource.links
+        resource.links = null
+        return doc
+    }
+    @GetMapping("/{id}/relationships/{relation}")
+    fun showRelationshipInternal(
+            @PathVariable("id") id: String,
+            @PathVariable("relation") relation: String,
+            req: HttpServletRequest
+    ): JSONAPIDocumentBase {
+        // TODO: Don't pass along if the relation doesn't exist
+        val resIds = showRelationship(id, relation)
+        // TODO: Differentiate between has_one and has_many
+        val doc = JSONAPIResourceIDsDocument(data = resIds)
+        // TODO: Move into convenience method
+//        val root = req.requestURL.toString().split(req.servletPath).first()
+//        return "$root/${route.trim('/')}/$id"
+        doc.links = mapOf(
+                "self" to req.requestURL.toString(),
+                "related" to "blargh"
+        )
         return doc
     }
 
+
     // fun create() { ... }   // POST      /foos
-    // fun show() { ... }     // GET       /foos/:id
     // fun update() { ... }   // PUT|PATCH /foos/:id
     // fun destroy() { ... }  // DELETE    /foos/:id
 
