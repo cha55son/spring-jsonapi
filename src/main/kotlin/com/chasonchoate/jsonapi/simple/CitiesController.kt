@@ -97,6 +97,9 @@ class CitiesController {
     }
 }
 
+/**
+ * Need some kind of annotation to prevent resources of the same type
+ */
 data class City(val id: String, val name: String, val current: Boolean) {
     companion object {
         const val TYPE = "city"
@@ -105,6 +108,10 @@ data class City(val id: String, val name: String, val current: Boolean) {
     }
     fun toResource(): JSONAPIResource {
         val res = JSONAPIResource(id, TYPE)
+        /**
+         * Should not be able to have attributes and relationships with the same name.
+         * Attributes cannot have a key with `relationships` or `links`.
+         */
         res.attributes["name"] = name
         res.attributes["current"] = current
         RELATIONS.forEach {
