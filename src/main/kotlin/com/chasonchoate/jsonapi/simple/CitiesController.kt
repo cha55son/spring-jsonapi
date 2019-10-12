@@ -5,12 +5,14 @@ import com.chasonchoate.jsonapi.simple.LinkHelper.relatedLink
 import com.chasonchoate.jsonapi.simple.LinkHelper.relationshipLink
 import com.chasonchoate.jsonapi.simple.LinkHelper.resourceLink
 import com.chasonchoate.jsonapi.simple.LinkHelper.resourcesLink
+import org.omg.CosNaming.NamingContextPackage.NotFound
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
+import java.lang.RuntimeException
 
 val cities = listOf(
         City("1", "Murfreesboro", false),
@@ -31,28 +33,67 @@ class CitiesController {
     @GetMapping("/{id}")
     fun show(@PathVariable("id") id: String): JSONAPIResourceDocument {
         val city = cities.find { it.id == id } ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
-        val doc = JSONAPIResourceDocument(city.toResource())
-        doc.links = mapOf("self" to resourceLink(City.ROUTE, city.id))
+        val res = city.toResource()
+        // Move the resource links to the document
+        val links = res.links
+        res.links = mutableMapOf()
+        val doc = JSONAPIResourceDocument(res)
+        doc.links = links
         return doc
     }
-    @GetMapping("/{id}/relationships/${City.FAV_LOC_RELATION}")
-    fun showRelationship(@PathVariable("id") id: String): JSONAPIResourceHasManyRelationship {
-        val locations = locations.filter { it.cityId == id }.map {
-            JSONAPIResourceID(it.id, FavoriteLocation.TYPE)
+    @GetMapping("/{id}/relationships/{relation}")
+    fun showRelationship(
+            @PathVariable("id") id: String,
+            @PathVariable("relation") relation: String
+    ): JSONAPIResourceHasManyRelationship {
+        if (!City.RELATIONS.contains(relation)) {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND)
         }
-        val doc = JSONAPIResourceHasManyRelationship(locations)
+        val resIds = when(relation) {
+            City.RELATIONS[0] -> showRelationshipLocations(id)
+            City.RELATIONS[1] -> showRelationshipAttractions(id)
+            else -> throw RuntimeException("bad relation")
+        }
+        val doc = JSONAPIResourceHasManyRelationship(resIds)
         doc.links = mapOf(
-                "self" to relationshipLink(City.ROUTE, id, City.FAV_LOC_RELATION),
-                "related" to relatedLink(City.ROUTE, id, City.FAV_LOC_RELATION)
+                "self" to relationshipLink(City.ROUTE, id, relation),
+                "related" to relatedLink(City.ROUTE, id, relation)
         )
         return doc
     }
-    @GetMapping("/{id}/favoriteLocations")
-    fun indexRelatedResources(@PathVariable("id") id: String): JSONAPIResourcesDocument {
-        val locs = locations.filter { it.cityId == id }.map { it.toResource() }
-        val doc = JSONAPIResourcesDocument(locs)
-        doc.links = mapOf("self" to relatedLink(City.ROUTE, id, City.FAV_LOC_RELATION))
+    @GetMapping("/{id}/{relation}")
+    fun indexRelatedResources(
+            @PathVariable("id") id: String,
+            @PathVariable("relation") relation: String
+    ): JSONAPIResourcesDocument {
+        if (!City.RELATIONS.contains(relation)) {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND)
+        }
+        val resources = when(relation) {
+            City.RELATIONS[0] -> indexRelatedResourcesLocations(id)
+            City.RELATIONS[1] -> indexRelatedResourcesAttractions(id)
+            else -> throw RuntimeException("bad relation")
+        }
+        val doc = JSONAPIResourcesDocument(resources)
+        doc.links = mapOf("self" to relatedLink(City.ROUTE, id, relation))
         return doc
+    }
+
+    private fun showRelationshipLocations(id: String): List<JSONAPIResourceID> {
+        return locations.filter { it.cityId == id }.map {
+            JSONAPIResourceID(it.id, FavoriteLocation.TYPE)
+        }
+    }
+    private fun showRelationshipAttractions(id: String): List<JSONAPIResourceID> {
+        return attractions.filter { it.cityId == id }.map {
+            JSONAPIResourceID(it.id, Attraction.TYPE)
+        }
+    }
+    private fun indexRelatedResourcesLocations(id: String): List<JSONAPIResource> {
+        return locations.filter { it.cityId == id }.map { it.toResource() }
+    }
+    private fun indexRelatedResourcesAttractions(id: String): List<JSONAPIResource> {
+        return attractions.filter { it.cityId == id }.map { it.toResource() }
     }
 }
 
@@ -60,21 +101,21 @@ data class City(val id: String, val name: String, val current: Boolean) {
     companion object {
         const val TYPE = "city"
         const val ROUTE = "/cities"
-        const val FAV_LOC_RELATION = "favoriteLocations"
+        val RELATIONS = arrayOf("favoriteLocations", "attractions")
     }
     fun toResource(): JSONAPIResource {
         val res = JSONAPIResource(id, TYPE)
-        res.attributes = mapOf(
-                "name" to name,
-                "current" to current
-        )
-        val favLocs = JSONAPIResourceRelationshipBase()
-        favLocs.links = mapOf(
-                "self" to relationshipLink(ROUTE, id, FAV_LOC_RELATION),
-                "related" to relatedLink(ROUTE, id, FAV_LOC_RELATION)
-        )
-        res.relationships = mapOf(FAV_LOC_RELATION to favLocs)
-        res.links = mapOf("self" to resourceLink(ROUTE, id))
+        res.attributes["name"] = name
+        res.attributes["current"] = current
+        RELATIONS.forEach {
+            val rel = JSONAPIResourceRelationshipBase()
+            rel.links = mapOf(
+                    "self" to relationshipLink(ROUTE, id, it),
+                    "related" to relatedLink(ROUTE, id, it)
+            )
+            res.relationships[it] = rel
+        }
+        res.links["self"] = resourceLink(ROUTE, id)
         return res
     }
 }

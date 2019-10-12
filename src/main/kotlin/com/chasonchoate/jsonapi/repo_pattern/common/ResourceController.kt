@@ -26,7 +26,7 @@ open class ResourceController<T : Resource> {
         val resource = show(id).toResource(req)
         val doc = JSONAPIResourceDocument(resource)
         doc.links = resource.links
-        resource.links = null
+        resource.links.clear()
         return doc
     }
     @GetMapping("/{id}/relationships/{relation}")

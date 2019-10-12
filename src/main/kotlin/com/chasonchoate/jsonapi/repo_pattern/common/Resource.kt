@@ -28,7 +28,7 @@ abstract class Resource(var id: String, var type: String, var route: String) {
     }
 
     private fun parseLinks(res: JSONAPIResource, req: HttpServletRequest) {
-        res.links = mapOf("self" to selfLink(req))
+        res.links["self"] = selfLink(req)
     }
 
     private fun parseAttributes(res: JSONAPIResource, req: HttpServletRequest) {

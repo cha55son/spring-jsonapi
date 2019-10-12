@@ -1,12 +1,16 @@
 package com.chasonchoate.jsonapi.simple
 
 import com.chasonchoate.jsonapi.JSONAPIResource
+import com.chasonchoate.jsonapi.JSONAPIResourceDocument
 import com.chasonchoate.jsonapi.JSONAPIResourcesDocument
 import com.chasonchoate.jsonapi.simple.LinkHelper.resourceLink
 import com.chasonchoate.jsonapi.simple.LinkHelper.resourcesLink
+import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.server.ResponseStatusException
 
 val locations = listOf(
         FavoriteLocation("1", "MTSU", "1"),
@@ -19,6 +23,9 @@ val locations = listOf(
         FavoriteLocation("8", "Canterbury Neighborhood", "4")
 )
 
+/**
+ * Demonstrates a related resource that lives at the root.
+ */
 @RestController
 @RequestMapping(FavoriteLocation.ROUTE)
 class FavoriteLocationsController {
@@ -26,6 +33,13 @@ class FavoriteLocationsController {
     fun index(): JSONAPIResourcesDocument {
         val doc = JSONAPIResourcesDocument(locations.map { it.toResource() })
         doc.links = mapOf("self" to resourcesLink(FavoriteLocation.ROUTE))
+        return doc
+    }
+    @GetMapping("/{id}")
+    fun show(@PathVariable("id") id: String): JSONAPIResourceDocument {
+        val loc = locations.find { it.id == id } ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
+        val doc = JSONAPIResourceDocument(loc.toResource())
+        doc.links = mapOf("self" to resourceLink(FavoriteLocation.ROUTE, id))
         return doc
     }
 }
@@ -37,8 +51,8 @@ data class FavoriteLocation(val id: String, val name: String, val cityId: String
     }
     fun toResource(): JSONAPIResource {
         val res = JSONAPIResource(id, TYPE)
-        res.attributes = mapOf("name" to name)
-        res.links = mapOf("self" to resourceLink(ROUTE, id))
+        res.attributes["name"] = name
+        res.links["self"] = resourceLink(ROUTE, id)
         return res
     }
 }
