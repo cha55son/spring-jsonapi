@@ -1,7 +1,6 @@
-package com.chasonchoate.jsonapi.kg
+package com.chasonchoate.jsonapi.repo_pattern.kg
 
-import com.chasonchoate.jsonapi.common.Resource
-import kotlin.reflect.KProperty
+import com.chasonchoate.jsonapi.repo_pattern.common.Resource
 
 const val KGS_PATH = "/kgs"
 

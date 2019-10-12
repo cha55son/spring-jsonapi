@@ -1,8 +1,8 @@
-package com.chasonchoate.jsonapi.preference
+package com.chasonchoate.jsonapi.repo_pattern.preference
 
-import com.chasonchoate.jsonapi.common.Resource
-import com.chasonchoate.jsonapi.common.ResourceRelationship
-import com.chasonchoate.jsonapi.common.ResourceRelationshipType
+import com.chasonchoate.jsonapi.repo_pattern.common.Resource
+import com.chasonchoate.jsonapi.repo_pattern.common.ResourceRelationship
+import com.chasonchoate.jsonapi.repo_pattern.common.ResourceRelationshipType
 
 const val PREFERENCES_PATH = "/preferences"
 

@@ -1,5 +1,6 @@
-package com.chasonchoate.jsonapi.common
+package com.chasonchoate.jsonapi.repo_pattern.common
 
+import com.chasonchoate.jsonapi.*
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import javax.servlet.http.HttpServletRequest

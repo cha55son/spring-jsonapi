@@ -1,7 +1,7 @@
-package com.chasonchoate.jsonapi.kg
+package com.chasonchoate.jsonapi.repo_pattern.kg
 
-import com.chasonchoate.jsonapi.common.JSONAPIController
-import com.chasonchoate.jsonapi.common.ResourceController
+import com.chasonchoate.jsonapi.repo_pattern.common.JSONAPIController
+import com.chasonchoate.jsonapi.repo_pattern.common.ResourceController
 import org.springframework.web.bind.annotation.RequestMapping
 
 @JSONAPIController
@@ -17,5 +17,5 @@ class KGsController : ResourceController<KG>() {
         kg1.active = false
         return kg1
     }
-    // fun showRelationship() { ... }       // GET /kgs/:id/relationships/comms
+    // fun showRelationship() { ... }       // GET /cities/:id/relationships/comms
 }

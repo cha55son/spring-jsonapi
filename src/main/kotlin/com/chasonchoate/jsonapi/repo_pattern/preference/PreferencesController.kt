@@ -1,9 +1,8 @@
-package com.chasonchoate.jsonapi.preference
+package com.chasonchoate.jsonapi.repo_pattern.preference
 
-import com.chasonchoate.jsonapi.common.JSONAPIController
-import com.chasonchoate.jsonapi.common.JSONAPIResourceID
-import com.chasonchoate.jsonapi.common.ResourceController
-import com.chasonchoate.jsonapi.kg.KG
+import com.chasonchoate.jsonapi.repo_pattern.common.JSONAPIController
+import com.chasonchoate.jsonapi.JSONAPIResourceID
+import com.chasonchoate.jsonapi.repo_pattern.common.ResourceController
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.server.ResponseStatusException

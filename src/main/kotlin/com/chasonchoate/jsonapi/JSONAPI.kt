@@ -1,4 +1,4 @@
-package com.chasonchoate.jsonapi.common
+package com.chasonchoate.jsonapi
 
 import com.fasterxml.jackson.annotation.JsonInclude
 

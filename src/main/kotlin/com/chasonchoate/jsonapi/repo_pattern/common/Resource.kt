@@ -1,5 +1,7 @@
-package com.chasonchoate.jsonapi.common
+package com.chasonchoate.jsonapi.repo_pattern.common
 
+import com.chasonchoate.jsonapi.JSONAPIResource
+import com.chasonchoate.jsonapi.JSONAPIResourceRelationshipBase
 import javax.servlet.http.HttpServletRequest
 import kotlin.reflect.KProperty
 import kotlin.reflect.KProperty0
