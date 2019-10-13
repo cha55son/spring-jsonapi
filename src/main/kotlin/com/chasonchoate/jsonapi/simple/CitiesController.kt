@@ -7,10 +7,7 @@ import com.chasonchoate.jsonapi.simple.LinkHelper.resourceLink
 import com.chasonchoate.jsonapi.simple.LinkHelper.resourcesLink
 import org.omg.CosNaming.NamingContextPackage.NotFound
 import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import java.lang.RuntimeException
 
@@ -31,13 +28,69 @@ class CitiesController {
         return doc
     }
     @GetMapping("/{id}")
-    fun show(@PathVariable("id") id: String): JSONAPIResourceDocument {
+    fun show(@PathVariable("id") id: String, @RequestParam("include") include: String): JSONAPIResourceDocument {
         val city = cities.find { it.id == id } ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
         val res = city.toResource()
+        /**
+         * Run the sparse field check, this will influence the includes below
+         */
+        // ...
+        /**
+         * Adding included resources
+         */
+        val doc = JSONAPIResourceDocument(res)
+        val included = include.split(",")
+        if (included.isNotEmpty()) {
+            val includedResources = mutableListOf<JSONAPIResource>()
+            included.forEach {
+                /**
+                 * Needs to be recursive on the resource
+                 */
+                val includedTokens = it.split(".")
+                /**
+                 * for each include path
+                 *   resource.includeResources(acc, path.split("."))
+                 *     bail if there are no tokens
+                 *     resources = get all resources for relation tokens[0]
+                 *     acc.addAll(resources)
+                 *     Update it.relation data
+                 *     resources.forEach { it.includeResources(acc, tokens[1..-1]) }
+                 *
+                 */
+                when (it) {
+                    City.RELATIONS[0] -> {
+                        val resources = indexRelatedResourcesLocations(id)
+                        includedResources.addAll(resources)
+                        val prevRel = res.relationships[City.RELATIONS[0]]!!
+                        val rel = JSONAPIResourceHasManyRelationship(resources.map {
+                            JSONAPIResourceID(it.id, it.type)
+                        })
+                        rel.links = prevRel.links
+                        rel.meta = prevRel.meta
+                        res.relationships[City.RELATIONS[0]] = rel
+                        // Update the primary resource so that the relation has the correct resource ids.
+
+                    }
+                    City.RELATIONS[1] -> {
+                        val resources = indexRelatedResourcesAttractions(id)
+                        includedResources.addAll(resources)
+                        val prevRel = res.relationships[City.RELATIONS[1]]!!
+                        val rel = JSONAPIResourceHasManyRelationship(resources.map {
+                            JSONAPIResourceID(it.id, it.type)
+                        })
+                        rel.links = prevRel.links
+                        rel.meta = prevRel.meta
+                        res.relationships[City.RELATIONS[1]] = rel
+                        // Update the primary resource so that the relation has the correct resource ids.
+                    }
+                    else -> throw RuntimeException("include param does not match a relation")
+                }
+            }
+            doc.included = includedResources
+        }
         // Move the resource links to the document
         val links = res.links
         res.links = mutableMapOf()
-        val doc = JSONAPIResourceDocument(res)
         doc.links = links
         return doc
     }

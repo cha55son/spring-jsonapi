@@ -1,7 +1,6 @@
 package com.chasonchoate.jsonapi
 
 import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.databind.annotation.JsonSerialize
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 open class JSONAPIDocumentBase {
@@ -9,10 +8,10 @@ open class JSONAPIDocumentBase {
     var meta: Map<String, Any>? = null
     var links: Map<String, JSONAPILink>? = null
 }
-class JSONAPIResourceDocument(var data: JSONAPIResource) : JSONAPIDocumentBase()
-class JSONAPIResourcesDocument(var data: List<JSONAPIResource>) : JSONAPIDocumentBase()
-class JSONAPIResourceIDDocument(var data: JSONAPIResourceID) : JSONAPIDocumentBase()
-class JSONAPIResourceIDsDocument(var data: List<JSONAPIResourceID>) : JSONAPIDocumentBase()
+open class JSONAPIResourceDocument(var data: JSONAPIResource?) : JSONAPIDocumentBase()
+open class JSONAPIResourcesDocument(var data: List<JSONAPIResource>) : JSONAPIDocumentBase()
+open class JSONAPIResourceIDDocument(var data: JSONAPIResourceID?) : JSONAPIDocumentBase()
+open class JSONAPIResourceIDsDocument(var data: List<JSONAPIResourceID>) : JSONAPIDocumentBase()
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 open class JSONAPIResourceRelationshipBase {
