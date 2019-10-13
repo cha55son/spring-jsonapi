@@ -32,14 +32,14 @@ class FavoriteLocationsController {
     @GetMapping
     fun index(): JSONAPIResourcesDocument {
         val doc = JSONAPIResourcesDocument(locations.map { it.toResource() })
-        doc.links = mapOf("self" to resourcesLink(FavoriteLocation.ROUTE))
+        doc.links["self"] = resourcesLink(FavoriteLocation.ROUTE)
         return doc
     }
     @GetMapping("/{id}")
     fun show(@PathVariable("id") id: String): JSONAPIResourceDocument {
         val loc = locations.find { it.id == id } ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
         val doc = JSONAPIResourceDocument(loc.toResource())
-        doc.links = mapOf("self" to resourceLink(FavoriteLocation.ROUTE, id))
+        doc.links["self"] = resourceLink(FavoriteLocation.ROUTE, id)
         return doc
     }
 }

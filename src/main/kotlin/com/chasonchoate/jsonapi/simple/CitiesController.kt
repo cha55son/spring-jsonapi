@@ -24,7 +24,7 @@ class CitiesController {
     @GetMapping
     fun index(): JSONAPIResourcesDocument {
         val doc = JSONAPIResourcesDocument(cities.map { it.toResource() })
-        doc.links = mapOf("self" to resourcesLink(City.ROUTE))
+        doc.links["self"] = resourcesLink(City.ROUTE)
         return doc
     }
     @GetMapping("/{id}")
@@ -108,10 +108,8 @@ class CitiesController {
             else -> throw RuntimeException("bad relation")
         }
         val doc = JSONAPIResourceHasManyRelationship(resIds)
-        doc.links = mapOf(
-                "self" to relationshipLink(City.ROUTE, id, relation),
-                "related" to relatedLink(City.ROUTE, id, relation)
-        )
+        doc.links["self"] = relationshipLink(City.ROUTE, id, relation)
+        doc.links["related"] = relatedLink(City.ROUTE, id, relation)
         return doc
     }
     @GetMapping("/{id}/{relation}")
@@ -128,7 +126,7 @@ class CitiesController {
             else -> throw RuntimeException("bad relation")
         }
         val doc = JSONAPIResourcesDocument(resources)
-        doc.links = mapOf("self" to relatedLink(City.ROUTE, id, relation))
+        doc.links["self"] = relatedLink(City.ROUTE, id, relation)
         return doc
     }
 
@@ -169,10 +167,8 @@ data class City(val id: String, val name: String, val current: Boolean) {
         res.attributes["current"] = current
         RELATIONS.forEach {
             val rel = JSONAPIResourceRelationshipBase()
-            rel.links = mapOf(
-                    "self" to relationshipLink(ROUTE, id, it),
-                    "related" to relatedLink(ROUTE, id, it)
-            )
+            rel.links["self"] = relationshipLink(ROUTE, id, it)
+            rel.links["related"] = relatedLink(ROUTE, id, it)
             res.relationships[it] = rel
         }
         res.links["self"] = resourceLink(ROUTE, id)

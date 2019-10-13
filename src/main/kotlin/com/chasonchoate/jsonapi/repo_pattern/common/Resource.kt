@@ -47,10 +47,8 @@ abstract class Resource(var id: String, var type: String, var route: String) {
         val relationships = mutableMapOf<String, JSONAPIResourceRelationshipBase>()
         relationships().forEach { (key) ->
             val doc = JSONAPIResourceRelationshipBase()
-            doc.links = mapOf(
-                    "self" to relationshipLink(key, req),
-                    "related" to relatedLink(key, req)
-            )
+            doc.links["self"] = relationshipLink(key, req)
+            doc.links["related"] = relatedLink(key, req)
             relationships[key] = doc
         }
         if (relationships.isNotEmpty()) {

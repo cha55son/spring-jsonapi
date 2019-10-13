@@ -18,7 +18,7 @@ open class ResourceController<T : Resource> {
     fun indexInternal(req: HttpServletRequest): JSONAPIResourcesDocument {
         val resources = index().map { it.toResource(req) }
         val doc = JSONAPIResourcesDocument(resources)
-        doc.links = mapOf("self" to req.requestURL.toString())
+        doc.links["self"] = req.requestURL.toString()
         return doc
     }
     @GetMapping("/{id}")
@@ -42,10 +42,8 @@ open class ResourceController<T : Resource> {
         // TODO: Move into convenience method
 //        val root = req.requestURL.toString().split(req.servletPath).first()
 //        return "$root/${route.trim('/')}/$id"
-        doc.links = mapOf(
-                "self" to req.requestURL.toString(),
-                "related" to "blargh"
-        )
+        doc.links["self"] = req.requestURL.toString()
+        doc.links["related"] = "blargh"
         return doc
     }
 
